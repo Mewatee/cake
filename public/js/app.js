@@ -788,8 +788,8 @@ function tryPlaceDecor(e){
 }
 
 /* ═══ SOLO VIEW ═══ */
-function enterSolo(){soloMode=true;document.getElementById('solo-back').style.display='block';document.getElementById('mode-badge').style.display='block';document.getElementById('hint').textContent='Drag: orbit · Shift+drag: pan · Click: place decoration';boxGrp.visible=false;scatterGrp.visible=false;for(var i=0;i<4;i++)cakeGrps[i].visible=(i===cur);soloAz=0;soloEl=.5;soloDist=3;panX=0;panY=0;}
-function exitSolo(){soloMode=false;deleteMode=false;document.getElementById('btn-del').classList.remove('active');document.getElementById('solo-back').style.display='none';document.getElementById('mode-badge').style.display='none';document.getElementById('hint').textContent='Drag to rotate \xb7 Scroll to zoom';boxGrp.visible=true;scatterGrp.visible=true;for(var i=0;i<4;i++)cakeGrps[i].visible=true;}
+function enterSolo(){soloMode=true;var _sb=document.getElementById('solo-back');if(_sb)_sb.style.display='block';document.getElementById('mode-badge').style.display='block';document.getElementById('hint').textContent='Drag: orbit · Shift+drag: pan · Click: place decoration';boxGrp.visible=false;scatterGrp.visible=false;for(var i=0;i<4;i++)cakeGrps[i].visible=(i===cur);soloAz=0;soloEl=.5;soloDist=3;panX=0;panY=0;}
+function exitSolo(){soloMode=false;deleteMode=false;var _bd=document.getElementById('btn-del');if(_bd)_bd.classList.remove('active','on');var _sb=document.getElementById('solo-back');if(_sb)_sb.style.display='none';document.getElementById('mode-badge').style.display='none';document.getElementById('hint').textContent='Drag to rotate \xb7 Scroll to zoom';boxGrp.visible=true;scatterGrp.visible=true;for(var i=0;i<4;i++)cakeGrps[i].visible=true;}
 
 /* ═══ CONTROLS ═══ */
 var lidAng=0,tLid=0,isDrag=false,shiftHeld=false,dragDist=0;
@@ -958,6 +958,5 @@ function submitOrder(){
   }).catch(function(){});
 })();
 
-// On phones/tablets, start with the sidebar tucked away so the cake is visible
-if(innerWidth<820){document.getElementById('side').classList.add('closed');}
+// (legacy sidebar removed — premium UI shell handles layout via ui.js)
 setTimeout(function(){tLid=-Math.PI*.72;},700);loadUI();animate();initDrawCanvas();
