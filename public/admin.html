@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Celestial Cake — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0e1a;font-family:'Inter',sans-serif;color:#c0cce0;min-height:100vh}
+a{color:#c9a84c;text-decoration:none}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 20px}
+h1{font-size:14px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#c9a84c;margin-bottom:4px}
+.sub{font-size:11px;color:rgba(180,195,225,0.4);letter-spacing:1px;margin-bottom:26px}
+
+/* login card */
+#login{max-width:340px;margin:12vh auto 0;background:rgba(12,16,28,0.9);border:1px solid rgba(201,168,76,0.25);
+  border-radius:16px;padding:30px 26px;box-shadow:0 24px 60px rgba(0,0,0,0.6)}
+#login h1{text-align:center}
+#login .sub{text-align:center}
+label{display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(180,195,225,0.5);margin:0 0 6px}
+input{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#dce6f5;
+  font-family:inherit;font-size:13px;padding:11px 12px;border-radius:8px;outline:none;transition:border .2s}
+input:focus{border-color:rgba(201,168,76,0.5)}
+.btn{display:block;width:100%;margin-top:14px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.4);
+  color:#c9a84c;font-family:inherit;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  padding:12px;border-radius:8px;cursor:pointer;transition:all .2s}
+.btn:hover{background:rgba(201,168,76,0.2);border-color:#c9a84c}
+.err{color:#e08a8a;font-size:11px;margin-top:10px;text-align:center;min-height:14px}
+
+/* dashboard */
+#dash{display:none}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.logout{font-size:10px;letter-spacing:1px;color:rgba(180,195,225,0.5);cursor:pointer;border:1px solid rgba(255,255,255,0.1);
+  padding:7px 14px;border-radius:7px}
+.logout:hover{color:#e08a8a;border-color:rgba(220,80,80,0.3)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(201,168,76,0.7);
+  padding:10px 12px;border-bottom:1px solid rgba(201,168,76,0.2)}
+td{padding:12px;border-bottom:1px solid rgba(255,255,255,0.05);color:#c8d4e8}
+tr:hover td{background:rgba(201,168,76,0.04)}
+.oid{font-family:monospace;color:#c9a84c;font-size:11.5px}
+.muted{color:rgba(180,195,225,0.45);font-size:11px}
+select.status{background:#141a2c;border:1px solid rgba(255,255,255,0.12);color:#dce6f5;font-family:inherit;
+  font-size:11px;padding:5px 8px;border-radius:6px;cursor:pointer}
+.pill{font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:20px;font-weight:600}
+.open-link{font-size:11px;border:1px solid rgba(201,168,76,0.3);padding:5px 11px;border-radius:6px}
+.open-link:hover{background:rgba(201,168,76,0.1)}
+.empty{text-align:center;color:rgba(180,195,225,0.35);padding:50px;font-size:13px}
+.count{font-size:11px;color:rgba(180,195,225,0.4)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- LOGIN -->
+  <div id="login">
+    <h1>✦ Admin</h1>
+    <div class="sub">Celestial Cake Orders</div>
+    <label>Password</label>
+    <input type="password" id="pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()">
+    <div class="btn" onclick="login()">Sign In</div>
+    <div class="err" id="loginErr"></div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dash">
+    <div class="topbar">
+      <div>
+        <h1>✦ Cake Orders</h1>
+        <div class="sub"><span class="count" id="count"></span></div>
+      </div>
+      <div>
+        <span class="open-link" onclick="load()">↻ Refresh</span>
+        <span class="logout" onclick="logout()">Log out</span>
+      </div>
+    </div>
+    <table id="tbl">
+      <thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Pickup</th><th>Cakes</th><th>Status</th><th></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty" style="display:none">No orders yet.</div>
+  </div>
+
+</div>
+<script>
+var token = sessionStorage.getItem('cakeAdminToken') || '';
+var STATUSES = ['pending','baking','ready','collected','cancelled'];
+var STATUS_COLORS = {pending:'#c9a84c',baking:'#e0974c',ready:'#74c293',collected:'#7a9ad0',cancelled:'#d07a7a'};
+
+function show(which){
+  document.getElementById('login').style.display = which==='login'?'block':'none';
+  document.getElementById('dash').style.display  = which==='dash' ?'block':'none';
+}
+
+function login(){
+  var pw = document.getElementById('pw').value;
+  fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw})})
+    .then(function(r){return r.json().then(function(d){return {ok:r.ok,d:d};});})
+    .then(function(res){
+      if(res.ok && res.d.token){ token=res.d.token; sessionStorage.setItem('cakeAdminToken',token); show('dash'); load(); }
+      else { document.getElementById('loginErr').textContent = res.d.error || 'Login failed'; }
+    })
+    .catch(function(){ document.getElementById('loginErr').textContent='Server unreachable — is it running?'; });
+}
+
+function logout(){ token=''; sessionStorage.removeItem('cakeAdminToken'); show('login'); }
+
+function fmtDate(iso){ try{ var d=new Date(iso); return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }catch(e){return esc(iso);} }
+// Escape any order-supplied text before putting it in innerHTML (prevents stored XSS)
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+function load(){
+  fetch('/api/orders',{headers:{Authorization:'Bearer '+token}})
+    .then(function(r){ if(r.status===401){logout();throw 0;} return r.json(); })
+    .then(function(list){
+      var rows=document.getElementById('rows'); rows.innerHTML='';
+      document.getElementById('count').textContent = list.length+' order'+(list.length===1?'':'s');
+      document.getElementById('empty').style.display = list.length?'none':'block';
+      document.getElementById('tbl').style.display = list.length?'table':'none';
+      list.slice().reverse().forEach(function(o){
+        var tr=document.createElement('tr');
+        var c=o.customer||{};
+        var oid=esc(o.orderId), oidUrl=encodeURIComponent(o.orderId);
+        var sel='<select class="status" onchange="setStatus(\''+oidUrl+'\',this.value)">'+
+          STATUSES.map(function(s){return '<option '+(s===o.status?'selected':'')+'>'+s+'</option>';}).join('')+'</select>';
+        tr.innerHTML =
+          '<td class="oid">'+oid+'</td>'+
+          '<td class="muted">'+fmtDate(o.createdAt)+'</td>'+
+          '<td>'+(esc(c.name)||'<span class="muted">—</span>')+
+              '<br><span class="muted">'+esc(c.phone)+'</span></td>'+
+          '<td class="muted">'+(esc(c.pickup)||'—')+'</td>'+
+          '<td>'+(o.cakes|0)+'</td>'+
+          '<td>'+sel+'</td>'+
+          '<td><a class="open-link" href="/?order='+oidUrl+'" target="_blank">Open ↗</a></td>';
+        rows.appendChild(tr);
+      });
+    })
+    .catch(function(){});
+}
+
+function setStatus(id,status){
+  fetch('/api/orders/'+id+'/status',{method:'PATCH',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({status:status})});
+}
+
+// auto-resume session
+if(token){ show('dash'); load(); } else { show('login'); }
+</script>
+</body>
+</html>

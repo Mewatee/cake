@@ -1,0 +1,12 @@
+{
+  "name": "celestial-cake-designer",
+  "version": "1.0.0",
+  "description": "3D celestial bento cake designer with an order backend + admin dashboard",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

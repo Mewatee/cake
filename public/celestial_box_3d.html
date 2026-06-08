@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Celestial Bento Cake Designer</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div id="hint">Drag to rotate · Scroll to zoom</div>
+<div id="mode-badge">DECORATE MODE — Click cake to place</div>
+<div id="solo-back" onclick="exitSolo();switchTab('select')">← Back to Box</div>
+<div id="side-tog" onclick="document.getElementById('side').classList.remove('closed')">☰</div>
+
+<div id="side">
+ <div class="logo">✦ Celestial Cake Designer</div>
+
+ <div class="tabs">
+  <div class="tab active" data-tab="select" onclick="switchTab('select')">Select</div>
+  <div class="tab" data-tab="edit" onclick="switchTab('edit')">Edit Cake</div>
+ </div>
+
+ <!-- ── SELECT TAB ── -->
+ <div id="tab-select" class="tab-panel active">
+  <div class="sec">
+   <div class="sec-title">Choose Cake</div>
+   <div class="ck-grid">
+    <div class="ck-cell on" onclick="selCake(0)">Top L</div>
+    <div class="ck-cell" onclick="selCake(1)">Top R</div>
+    <div class="ck-cell" onclick="selCake(2)">Bot L</div>
+    <div class="ck-cell" onclick="selCake(3)">Bot R</div>
+   </div>
+   <div class="btn" onclick="enterSolo()" style="margin-top:8px">✦ Solo View</div>
+   <div class="btn" onclick="switchTab('edit')" style="margin-top:5px;background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.1);color:rgba(180,195,225,0.55)">✎ Edit Selected Cake</div>
+  </div>
+  <div class="sec">
+   <div class="sec-title">View Controls</div>
+   <div class="btn-row">
+    <div class="btn-sm" onclick="openLid()">Open Lid</div>
+    <div class="btn-sm" onclick="closeLid()">Close Lid</div>
+   </div>
+   <div class="btn-row" style="margin-top:5px">
+    <div class="btn-sm" id="btn-spin" onclick="toggleSpin()">Auto Spin</div>
+    <div class="btn-sm" onclick="resetCam()">Reset Cam</div>
+   </div>
+  </div>
+  <div class="sec">
+   <div class="sec-title">Order</div>
+   <div class="btn" onclick="openOrder()">🛒 Place Order</div>
+   <div id="order-loaded" style="display:none;font-size:9px;color:rgba(120,200,150,0.8);margin-top:7px;letter-spacing:.5px"></div>
+  </div>
+ </div>
+
+ <!-- ── EDIT TAB ── -->
+ <div id="tab-edit" class="tab-panel">
+  <div class="edit-tag">Editing — <strong id="edit-label">Top Left</strong></div>
+
+  <div class="sec">
+   <div class="sec-title">Cake Flavour</div>
+   <select id="sel-flavor" onchange="apply()"></select>
+   <div id="flavor-note" style="font-size:9.5px;color:rgba(180,195,225,0.45);margin-top:7px;line-height:1.4"></div>
+  </div>
+
+  <div class="sec">
+   <div class="sec-title">Frosting Color</div>
+   <div class="colors" id="swatches"></div>
+   <div class="cpick-row"><input type="color" id="cpick" value="#aaccdf" onchange="pickRGB(this.value)"><span>Custom RGB</span></div>
+   <label>Finish</label>
+   <select id="sel-finish" onchange="apply()">
+    <option value="matte">Matte</option><option value="satin" selected>Satin</option>
+    <option value="glossy">Glossy</option><option value="metallic">Metallic</option>
+   </select>
+  </div>
+
+  <div class="sec">
+   <div class="sec-title">Center Topping</div>
+   <select id="sel-top" onchange="apply()">
+    <option value="tarot_star">✦ The Star</option><option value="tarot_moon">☽ The Moon</option>
+    <option value="photo">◻ Photo Print</option><option value="text">✍ Custom Text</option>
+    <option value="floral">❀ Floral</option><option value="constellation">✧ Constellation</option>
+    <option value="heart">♡ Heart</option><option value="plain">— Plain</option>
+   </select>
+   <div id="photo-row" style="display:none;margin-top:8px">
+    <input type="file" id="photo-input" accept="image/*" onchange="uploadPhoto(this)" style="display:none">
+    <div class="btn" onclick="document.getElementById('photo-input').click()" style="margin-top:0">⬆ Upload Your Photo</div>
+    <div id="photo-status" style="font-size:9px;color:rgba(180,195,225,0.4);margin-top:6px;line-height:1.4"></div>
+    <div class="btn-sm btn-danger" id="photo-remove" style="display:none;margin-top:5px" onclick="removePhoto()">✕ Remove Photo</div>
+   </div>
+   <label>Line 1</label><input type="text" id="t1" value="Happy Birthday" oninput="apply()">
+   <label>Line 2</label><input type="text" id="t2" value="♡" oninput="apply()">
+   <label>Line 3</label><input type="text" id="t3" value="" placeholder="optional" oninput="apply()">
+  </div>
+
+  <div class="sec">
+   <div class="sec-title">Place Decorations</div>
+   <div class="dec-grid" id="dec-grid"></div>
+   <label style="margin-top:9px">Decoration Color</label>
+   <div class="dcol-row" id="dcol-row"></div>
+   <div class="cpick-row" style="margin-top:6px">
+    <input type="color" id="decpick" value="#f4b8c8" onchange="setDecorColor(this.value)">
+    <span>Any custom color</span>
+   </div>
+   <div class="size-row" style="margin-top:10px">
+    <span>Size</span>
+    <input type="range" id="dec-size" min="0.5" max="2" step="0.1" value="1" oninput="decorScale=parseFloat(this.value)">
+   </div>
+   <div class="size-row">
+    <span>Rotate</span>
+    <input type="range" id="dec-rot" min="0" max="360" step="15" value="0" oninput="decorRot=parseFloat(this.value)*Math.PI/180">
+   </div>
+   <div class="btn-row" style="margin-top:7px">
+    <div class="btn-sm" onclick="undoDecor()">↩ Undo</div>
+    <div class="btn-sm btn-danger" onclick="clearDecor()">✕ Clear All</div>
+   </div>
+   <div class="btn" id="btn-del" onclick="toggleDelete()" style="margin-top:5px;font-size:9px">🗑 Delete Mode</div>
+   <div style="font-size:9px;color:rgba(180,195,225,0.28);margin-top:9px;line-height:1.5">
+    Solo View → select type → click cake top to place.<br>
+    🌀 Whip Cream → drag across the cake to pipe a trail.<br>
+    Delete Mode → click near a placed decoration.
+   </div>
+  </div>
+ </div>
+
+ <div style="height:20px"></div>
+</div>
+
+<div id="draw-overlay" onclick="if(event.target===this)cancelDraw()">
+ <div id="draw-modal">
+  <div id="draw-topbar">
+   <span id="draw-topbar-title">✏ Draw Your Decoration</span>
+   <span id="draw-topbar-cancel" onclick="cancelDraw()">✕ Cancel</span>
+  </div>
+  <div id="draw-body">
+   <canvas id="draw-canvas" width="340" height="340"></canvas>
+   <div class="draw-tools">
+    <span id="draw-mirror-btn" class="draw-toggle" onclick="toggleMirror()">⇄ Symmetry</span>
+    <span id="draw-smooth-btn" class="draw-toggle on" onclick="toggleSmooth()">∿ Smooth</span>
+    <span id="draw-status" class="draw-status">Draw a shape…</span>
+   </div>
+  </div>
+  <div id="draw-bottombar">
+   <span id="draw-clear-btn" onclick="clearDrawCanvas()">↺ Clear</span>
+   <span id="draw-hint-text">Drag to draw · symmetry mirrors your stroke</span>
+   <span id="draw-confirm-btn" onclick="confirmDraw()">✓ Place Shape</span>
+  </div>
+ </div>
+</div>
+
+<!-- ORDER MODAL -->
+<div id="order-overlay" onclick="if(event.target===this)closeOrder()"
+  style="position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;z-index:99;display:none;
+  align-items:center;justify-content:center;background:rgba(0,0,0,0.78);backdrop-filter:blur(5px)">
+ <div style="width:340px;max-width:calc(100vw - 40px);background:rgba(10,14,26,0.99);border:1px solid rgba(201,168,76,0.35);
+   border-radius:16px;padding:22px 22px 20px;box-shadow:0 24px 64px rgba(0,0,0,0.8)">
+  <div style="font-size:11px;font-weight:700;letter-spacing:2.5px;color:#c9a84c;text-transform:uppercase;text-align:center;margin-bottom:16px">🛒 Place Your Order</div>
+  <div id="order-form">
+   <label>Name</label><input type="text" id="ord-name" placeholder="Your name">
+   <label>Phone</label><input type="text" id="ord-phone" placeholder="Contact number">
+   <label>Pickup date</label><input type="text" id="ord-pickup" placeholder="e.g. 2026-06-20">
+   <label>Notes</label><input type="text" id="ord-notes" placeholder="optional">
+   <div class="btn" onclick="submitOrder()" style="margin-top:14px">✓ Submit Order</div>
+   <div class="btn-sm" onclick="closeOrder()" style="margin-top:6px">Cancel</div>
+   <div id="ord-err" style="color:#e08a8a;font-size:10px;margin-top:8px;text-align:center;min-height:12px"></div>
+  </div>
+  <div id="order-done" style="display:none;text-align:center">
+   <div style="font-size:13px;color:#74c293;margin-bottom:8px">✓ Order placed!</div>
+   <div style="font-size:10px;color:rgba(180,195,225,0.5);letter-spacing:1px">Your order number</div>
+   <div id="ord-id" style="font-family:monospace;font-size:18px;color:#c9a84c;margin:6px 0 16px"></div>
+   <div class="btn" onclick="closeOrder()">Done</div>
+  </div>
+ </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
