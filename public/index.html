@@ -3,129 +3,254 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"/>
-<title>Celestial Bento Cake Designer</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Céleste — Celestial Bento Atelier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
-<div id="hint">Drag to rotate · Scroll to zoom</div>
-<div id="mode-badge">DECORATE MODE — Click cake to place</div>
-<div id="solo-back" onclick="exitSolo();switchTab('select')">← Back to Box</div>
-<div id="side-tog" onclick="document.getElementById('side').classList.toggle('closed')">☰</div>
 
-<div id="side">
- <div class="logo">✦ Celestial Cake Designer</div>
+<!-- ═══ CELESTIAL VIGNETTE (frames the 3D scene) ═══ -->
+<div id="vignette"></div>
 
- <div class="tabs">
-  <div class="tab active" data-tab="select" onclick="switchTab('select')">Select</div>
-  <div class="tab" data-tab="edit" onclick="switchTab('edit')">Edit Cake</div>
+<!-- ═══ ONBOARD ═══ -->
+<div id="onboard">
+ <div>
+  <div class="mk">✦</div>
+  <h1>Celestial Bento</h1>
+  <p>Cake Atelier</p>
+  <button class="go" onclick="dismissOnboard()">Begin Designing</button>
  </div>
-
- <!-- ── SELECT TAB ── -->
- <div id="tab-select" class="tab-panel active">
-  <div class="sec">
-   <div class="sec-title">Choose Cake</div>
-   <div class="ck-grid">
-    <div class="ck-cell on" onclick="selCake(0)">Top L</div>
-    <div class="ck-cell" onclick="selCake(1)">Top R</div>
-    <div class="ck-cell" onclick="selCake(2)">Bot L</div>
-    <div class="ck-cell" onclick="selCake(3)">Bot R</div>
-   </div>
-   <div class="btn" onclick="enterSolo()" style="margin-top:8px">✦ Solo View</div>
-   <div class="btn" onclick="switchTab('edit')" style="margin-top:5px;background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.1);color:rgba(180,195,225,0.55)">✎ Edit Selected Cake</div>
-  </div>
-  <div class="sec">
-   <div class="sec-title">View Controls</div>
-   <div class="btn-row">
-    <div class="btn-sm" onclick="openLid()">Open Lid</div>
-    <div class="btn-sm" onclick="closeLid()">Close Lid</div>
-   </div>
-   <div class="btn-row" style="margin-top:5px">
-    <div class="btn-sm" id="btn-spin" onclick="toggleSpin()">Auto Spin</div>
-    <div class="btn-sm" onclick="resetCam()">Reset Cam</div>
-   </div>
-  </div>
-  <div class="sec">
-   <div class="sec-title">Order</div>
-   <div class="btn" onclick="openOrder()">🛒 Place Order</div>
-   <div id="order-loaded" style="display:none;font-size:9px;color:rgba(120,200,150,0.8);margin-top:7px;letter-spacing:.5px"></div>
-  </div>
- </div>
-
- <!-- ── EDIT TAB ── -->
- <div id="tab-edit" class="tab-panel">
-  <div class="edit-tag">Editing — <strong id="edit-label">Top Left</strong></div>
-
-  <div class="sec">
-   <div class="sec-title">Cake Flavour</div>
-   <select id="sel-flavor" onchange="apply()"></select>
-   <div id="flavor-note" style="font-size:9.5px;color:rgba(180,195,225,0.45);margin-top:7px;line-height:1.4"></div>
-  </div>
-
-  <div class="sec">
-   <div class="sec-title">Frosting Color</div>
-   <div class="colors" id="swatches"></div>
-   <div class="cpick-row"><input type="color" id="cpick" value="#aaccdf" onchange="pickRGB(this.value)"><span>Custom RGB</span></div>
-   <label>Finish</label>
-   <select id="sel-finish" onchange="apply()">
-    <option value="matte">Matte</option><option value="satin" selected>Satin</option>
-    <option value="glossy">Glossy</option><option value="metallic">Metallic</option>
-   </select>
-  </div>
-
-  <div class="sec">
-   <div class="sec-title">Center Topping</div>
-   <select id="sel-top" onchange="apply()">
-    <option value="tarot_star">✦ The Star</option><option value="tarot_moon">☽ The Moon</option>
-    <option value="photo">◻ Photo Print</option><option value="text">✍ Custom Text</option>
-    <option value="floral">❀ Floral</option><option value="constellation">✧ Constellation</option>
-    <option value="heart">♡ Heart</option><option value="plain">— Plain</option>
-   </select>
-   <div id="photo-row" style="display:none;margin-top:8px">
-    <input type="file" id="photo-input" accept="image/*" onchange="uploadPhoto(this)" style="display:none">
-    <div class="btn" onclick="document.getElementById('photo-input').click()" style="margin-top:0">⬆ Upload Your Photo</div>
-    <div id="photo-status" style="font-size:9px;color:rgba(180,195,225,0.4);margin-top:6px;line-height:1.4"></div>
-    <div class="btn-sm btn-danger" id="photo-remove" style="display:none;margin-top:5px" onclick="removePhoto()">✕ Remove Photo</div>
-   </div>
-   <label>Line 1</label><input type="text" id="t1" value="Happy Birthday" oninput="apply()">
-   <label>Line 2</label><input type="text" id="t2" value="♡" oninput="apply()">
-   <label>Line 3</label><input type="text" id="t3" value="" placeholder="optional" oninput="apply()">
-  </div>
-
-  <div class="sec">
-   <div class="sec-title">Place Decorations</div>
-   <div class="dec-grid" id="dec-grid"></div>
-   <label style="margin-top:9px">Decoration Color</label>
-   <div class="dcol-row" id="dcol-row"></div>
-   <div class="cpick-row" style="margin-top:6px">
-    <input type="color" id="decpick" value="#f4b8c8" onchange="setDecorColor(this.value)">
-    <span>Any custom color</span>
-   </div>
-   <div class="size-row" style="margin-top:10px">
-    <span>Size</span>
-    <input type="range" id="dec-size" min="0.5" max="2" step="0.1" value="1" oninput="decorScale=parseFloat(this.value)">
-   </div>
-   <div class="size-row">
-    <span>Rotate</span>
-    <input type="range" id="dec-rot" min="0" max="360" step="15" value="0" oninput="decorRot=parseFloat(this.value)*Math.PI/180">
-   </div>
-   <div class="btn-row" style="margin-top:7px">
-    <div class="btn-sm" onclick="undoDecor()">↩ Undo</div>
-    <div class="btn-sm btn-danger" onclick="clearDecor()">✕ Clear All</div>
-   </div>
-   <div class="btn" id="btn-del" onclick="toggleDelete()" style="margin-top:5px;font-size:9px">🗑 Delete Mode</div>
-   <div style="font-size:9px;color:rgba(180,195,225,0.28);margin-top:9px;line-height:1.5">
-    Solo View → select type → click cake top to place.<br>
-    🌀 Whip Cream → drag across the cake to pipe a trail.<br>
-    Delete Mode → click near a placed decoration.
-   </div>
-  </div>
- </div>
-
- <div style="height:20px"></div>
 </div>
 
-<div id="draw-overlay" onclick="if(event.target===this)cancelDraw()">
+<!-- ═══ BRAND ═══ -->
+<div id="brand">
+ <div class="mark">✦</div>
+ <div class="wm"><b>CÉLESTE</b><small>Bento Cake Atelier</small></div>
+</div>
+
+<!-- ═══ VIEW DOCK (box view) ═══ -->
+<div id="viewdock">
+ <button class="vbtn on" id="lid-btn" data-tip="Open / close lid" onclick="toggleLid()" aria-label="Toggle lid">
+  <svg viewBox="0 0 24 24"><path d="M3 9l9-5 9 5"/><path d="M3 9v8l9 5 9-5V9"/><path d="M3 9l9 5 9-5"/></svg>
+ </button>
+ <button class="vbtn" id="btn-spin" data-tip="Auto-spin" onclick="toggleSpin()" aria-label="Auto spin">
+  <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v4h-4"/></svg>
+ </button>
+ <button class="vbtn" data-tip="Reset view" onclick="resetCam()" aria-label="Reset view">
+  <svg viewBox="0 0 24 24"><path d="M3 7V4h3"/><path d="M21 7V4h-3"/><path d="M3 17v3h3"/><path d="M21 17v3h-3"/></svg>
+ </button>
+ <div class="vdiv"></div>
+ <button id="order-btn" onclick="openOrder()">
+  <svg viewBox="0 0 24 24"><path d="M6 2L4 6v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6l-2-4z"/><path d="M4 6h16"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+  <span>Order</span>
+ </button>
+</div>
+
+<!-- ═══ CAKE TRAY (box view) ═══ -->
+<div id="tray">
+ <div class="tray-lbl"><b>Your Box</b><small>Four Cakes</small></div>
+ <button class="ctile" data-i="0" onclick="openEditor(0)">
+  <div class="row"><span class="dot"></span><span class="pos">Top Left</span></div>
+  <div class="flav">Vanilla</div>
+  <div class="edit">Edit ›</div>
+ </button>
+ <button class="ctile" data-i="1" onclick="openEditor(1)">
+  <div class="row"><span class="dot"></span><span class="pos">Top Right</span></div>
+  <div class="flav">Strawberry</div>
+  <div class="edit">Edit ›</div>
+ </button>
+ <button class="ctile" data-i="2" onclick="openEditor(2)">
+  <div class="row"><span class="dot"></span><span class="pos">Bot Left</span></div>
+  <div class="flav">Ube</div>
+  <div class="edit">Edit ›</div>
+ </button>
+ <button class="ctile" data-i="3" onclick="openEditor(3)">
+  <div class="row"><span class="dot"></span><span class="pos">Bot Right</span></div>
+  <div class="flav">Chocolate</div>
+  <div class="edit">Edit ›</div>
+ </button>
+</div>
+
+<!-- ═══ EDITOR ═══ -->
+<div id="editor">
+ <div class="ed-grip"></div>
+ <div class="ed-head">
+  <button class="ed-back" onclick="closeEditor()" aria-label="Back to box">
+   <svg viewBox="0 0 24 24"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+  </button>
+  <div class="t"><small>Editing</small><b id="edit-label">Top Left</b></div>
+  <div class="cyc">
+   <button onclick="cycleCake(-1)" aria-label="Previous cake"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+   <button onclick="cycleCake(1)" aria-label="Next cake"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+  </div>
+ </div>
+
+ <div class="ed-nav">
+  <button data-sec="frosting" class="on" onclick="setEditSection('frosting')">
+   <svg viewBox="0 0 24 24"><path d="M12 2.7C12 2.7 5 10 5 15a7 7 0 0 0 14 0c0-5-7-12.3-7-12.3z"/></svg><span>Frosting</span>
+  </button>
+  <button data-sec="sponge" onclick="setEditSection('sponge')">
+   <svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg><span>Sponge</span>
+  </button>
+  <button data-sec="topping" onclick="setEditSection('topping')">
+   <svg viewBox="0 0 24 24"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5L12 3z"/></svg><span>Topping</span>
+  </button>
+  <button data-sec="decor" onclick="setEditSection('decor')">
+   <svg viewBox="0 0 24 24"><path d="M12 4l1.5 4L18 9.5 14 12l1 5-3-2.7L9 17l1-5-4-2.5L10.5 8 12 4z"/><circle cx="19" cy="5" r="1"/><circle cx="5" cy="6" r="1"/></svg><span>Decor</span>
+  </button>
+ </div>
+
+ <div class="ed-scroll">
+  <!-- FROSTING -->
+  <div class="ed-sec on" data-sec="frosting">
+   <div class="field">
+    <div class="lab">Frosting Colour</div>
+    <div class="colors" id="swatches"></div>
+    <div class="cpick-row">
+     <input type="color" id="cpick" value="#aaccdf" onchange="pickRGB(this.value)">
+     <span>Custom colour</span>
+    </div>
+   </div>
+   <div class="field">
+    <div class="lab">Finish</div>
+    <div class="seg" id="finish-seg">
+     <button data-f="matte" onclick="selectFinish('matte')">Matte</button>
+     <button data-f="satin" onclick="selectFinish('satin')">Satin</button>
+     <button data-f="glossy" onclick="selectFinish('glossy')">Glossy</button>
+     <button data-f="metallic" onclick="selectFinish('metallic')">Metal</button>
+    </div>
+   </div>
+  </div>
+
+  <!-- SPONGE -->
+  <div class="ed-sec" data-sec="sponge">
+   <div class="field">
+    <div class="lab">Cake Flavour</div>
+    <div class="cardgrid" id="flavor-cards"></div>
+    <div class="note" id="flavor-note"></div>
+   </div>
+  </div>
+
+  <!-- TOPPING -->
+  <div class="ed-sec" data-sec="topping">
+   <div class="field">
+    <div class="lab">Centre Topping</div>
+    <div class="cardgrid" id="topping-cards"></div>
+    <div id="photo-row" style="display:none">
+     <input type="file" id="photo-input" accept="image/*" onchange="uploadPhoto(this)" style="display:none">
+     <div class="uploader" onclick="document.getElementById('photo-input').click()">
+      <div class="ttl">⬆ Upload your photo</div>
+      <div class="sub" id="photo-status">Using placeholder — upload to personalise.</div>
+     </div>
+     <button class="act danger wide" id="photo-remove" style="display:none;margin-top:8px" onclick="removePhoto()">Remove photo</button>
+    </div>
+   </div>
+   <div class="field">
+    <div class="lab">Message</div>
+    <span class="minilab">Line 1</span>
+    <input class="txt" type="text" id="t1" value="Happy Birthday" oninput="apply()">
+    <span class="minilab">Line 2</span>
+    <input class="txt" type="text" id="t2" value="♡" oninput="apply()">
+    <span class="minilab">Line 3</span>
+    <input class="txt" type="text" id="t3" value="" placeholder="optional" oninput="apply()">
+   </div>
+  </div>
+
+  <!-- DECOR -->
+  <div class="ed-sec" data-sec="decor">
+   <div class="field">
+    <div class="lab">Decorations</div>
+    <div class="dec-grid" id="dec-grid"></div>
+   </div>
+   <div class="field">
+    <div class="lab">Decoration Colour</div>
+    <div class="dcol-row" id="dcol-row"></div>
+    <div class="cpick-row">
+     <input type="color" id="decpick" value="#f4b8c8" onchange="setDecorColor(this.value)">
+     <span>Custom colour</span>
+    </div>
+    <div class="slider-row"><span class="sl-lab">Size</span>
+     <input type="range" id="dec-size" min="0.5" max="2" step="0.1" value="1" oninput="decorScale=parseFloat(this.value)"></div>
+    <div class="slider-row"><span class="sl-lab">Rotate</span>
+     <input type="range" id="dec-rot" min="0" max="360" step="15" value="0" oninput="decorRot=parseFloat(this.value)*Math.PI/180"></div>
+    <div class="actrow">
+     <button class="act" onclick="undoDecor()">
+      <svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>Undo</button>
+     <button class="act danger" onclick="clearDecor()">Clear all</button>
+     <button class="act wide" id="btn-del" onclick="toggleDelete()">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/></svg>Delete mode</button>
+    </div>
+    <div class="hint-card">
+     <b>Tap the cake</b> to place your selected decoration.<br>
+     <b>Whip Cream</b> — drag across the cake to pipe a trail.<br>
+     <b>Custom</b> — tap the cake, then draw your own shape.
+    </div>
+   </div>
+  </div>
+ </div>
+
+ <div class="ed-foot">
+  <button class="btn-primary" onclick="openOrder()">
+   <svg viewBox="0 0 24 24"><path d="M6 2L4 6v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6l-2-4z"/><path d="M4 6h16"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+   Place Order
+  </button>
+ </div>
+</div>
+
+<!-- ═══ app.js chrome (kept) ═══ -->
+<div id="mode-badge">DECORATE MODE — Tap cake to place</div>
+<div id="hint">Drag to rotate · Scroll to zoom</div>
+<div id="order-loaded" style="display:none;position:fixed;bottom:78px;left:50%;transform:translateX(-50%);z-index:26;font-size:10px;color:var(--gold);letter-spacing:1px;background:rgba(8,11,20,0.7);padding:6px 14px;border-radius:14px;backdrop-filter:blur(8px)"></div>
+
+<!-- hidden bridge controls read by the 3D engine -->
+<div style="position:absolute;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none">
+ <select id="sel-flavor"></select>
+ <select id="sel-finish">
+  <option value="matte">Matte</option><option value="satin" selected>Satin</option>
+  <option value="glossy">Glossy</option><option value="metallic">Metallic</option>
+ </select>
+ <select id="sel-top">
+  <option value="tarot_star">The Star</option><option value="tarot_moon">The Moon</option>
+  <option value="photo">Photo Print</option><option value="text">Custom Text</option>
+  <option value="floral">Floral</option><option value="constellation">Constellation</option>
+  <option value="heart">Heart</option><option value="plain">Plain</option>
+ </select>
+</div>
+
+<!-- ═══ ORDER MODAL ═══ -->
+<div class="overlay" id="order-overlay" onclick="if(event.target===this)closeOrder()">
+ <div class="modal">
+  <div class="modal-head">
+   <span class="mk">✦</span>
+   <div class="ti">Reserve Your Box</div>
+   <div class="su">Céleste Atelier</div>
+  </div>
+  <div class="modal-body">
+   <div id="order-form">
+    <span class="minilab">Name</span><input class="txt" type="text" id="ord-name" placeholder="Your name">
+    <span class="minilab">Phone</span><input class="txt" type="text" id="ord-phone" placeholder="Contact number">
+    <span class="minilab">Pickup date</span><input class="txt" type="text" id="ord-pickup" placeholder="e.g. 2026-06-20">
+    <span class="minilab">Notes</span><input class="txt" type="text" id="ord-notes" placeholder="optional">
+    <button class="btn-primary" style="margin-top:18px" onclick="submitOrder()">
+     <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Submit Order</button>
+    <button class="btn-ghost" onclick="closeOrder()">Cancel</button>
+    <div id="ord-err"></div>
+   </div>
+   <div id="order-done">
+    <div class="chk"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+    <div class="dn-ti">Order placed</div>
+    <div class="dn-su">Your order number</div>
+    <div id="ord-id"></div>
+    <button class="btn-primary" onclick="closeOrder()">Done</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+<!-- ═══ DRAW MODAL ═══ -->
+<div class="overlay" id="draw-overlay" onclick="if(event.target===this)cancelDraw()">
  <div id="draw-modal">
   <div id="draw-topbar">
    <span id="draw-topbar-title">✏ Draw Your Decoration</span>
@@ -147,32 +272,8 @@
  </div>
 </div>
 
-<!-- ORDER MODAL -->
-<div id="order-overlay" onclick="if(event.target===this)closeOrder()"
-  style="position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;z-index:99;display:none;
-  align-items:center;justify-content:center;background:rgba(0,0,0,0.78);backdrop-filter:blur(5px)">
- <div style="width:340px;max-width:calc(100vw - 40px);background:rgba(10,14,26,0.99);border:1px solid rgba(201,168,76,0.35);
-   border-radius:16px;padding:22px 22px 20px;box-shadow:0 24px 64px rgba(0,0,0,0.8)">
-  <div style="font-size:11px;font-weight:700;letter-spacing:2.5px;color:#c9a84c;text-transform:uppercase;text-align:center;margin-bottom:16px">🛒 Place Your Order</div>
-  <div id="order-form">
-   <label>Name</label><input type="text" id="ord-name" placeholder="Your name">
-   <label>Phone</label><input type="text" id="ord-phone" placeholder="Contact number">
-   <label>Pickup date</label><input type="text" id="ord-pickup" placeholder="e.g. 2026-06-20">
-   <label>Notes</label><input type="text" id="ord-notes" placeholder="optional">
-   <div class="btn" onclick="submitOrder()" style="margin-top:14px">✓ Submit Order</div>
-   <div class="btn-sm" onclick="closeOrder()" style="margin-top:6px">Cancel</div>
-   <div id="ord-err" style="color:#e08a8a;font-size:10px;margin-top:8px;text-align:center;min-height:12px"></div>
-  </div>
-  <div id="order-done" style="display:none;text-align:center">
-   <div style="font-size:13px;color:#74c293;margin-bottom:8px">✓ Order placed!</div>
-   <div style="font-size:10px;color:rgba(180,195,225,0.5);letter-spacing:1px">Your order number</div>
-   <div id="ord-id" style="font-family:monospace;font-size:18px;color:#c9a84c;margin:6px 0 16px"></div>
-   <div class="btn" onclick="closeOrder()">Done</div>
-  </div>
- </div>
-</div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="js/app.js"></script>
+<script src="js/ui.js"></script>
 </body>
 </html>
