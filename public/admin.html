@@ -140,7 +140,7 @@ function load(){
 }
 
 function setStatus(id,status){
-  fetch('/api/orders/'+id+'/status',{method:'PATCH',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({status:status})});
+  fetch('/api/status?id='+encodeURIComponent(id),{method:'PATCH',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({status:status})});
 }
 
 // auto-resume session

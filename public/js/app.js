@@ -81,12 +81,22 @@ function uploadPhoto(inp){
   rd.onload=function(ev){
     var img=new Image();
     img.onload=function(){
-      cakeData[cur].photo=img;
-      cakeData[cur].photoSrc=ev.target.result;   // keep data-URL so the order can be saved
-      cakeData[cur].top='photo';
-      document.getElementById('sel-top').value='photo';
-      updatePhotoRow();
-      buildCake(cur);
+      // Downscale big phone/iPad photos → small data-URL (fast, and stays under upload limits)
+      var MAXD=1100, sc=Math.min(1, MAXD/Math.max(img.width,img.height));
+      var cw=Math.max(1,Math.round(img.width*sc)), ch=Math.max(1,Math.round(img.height*sc));
+      var cv=document.createElement('canvas');cv.width=cw;cv.height=ch;
+      cv.getContext('2d').drawImage(img,0,0,cw,ch);
+      var durl;try{durl=cv.toDataURL('image/jpeg',0.85);}catch(e){durl=ev.target.result;}
+      var fin=new Image();
+      fin.onload=function(){
+        cakeData[cur].photo=fin;
+        cakeData[cur].photoSrc=durl;            // compact data-URL saved with the order
+        cakeData[cur].top='photo';
+        document.getElementById('sel-top').value='photo';
+        updatePhotoRow();
+        buildCake(cur);
+      };
+      fin.src=durl;
     };
     img.onerror=function(){document.getElementById('photo-status').textContent='⚠ Could not read that image. Try another.';};
     img.src=ev.target.result;
@@ -839,9 +849,26 @@ renderer.domElement.addEventListener('mousedown',function(e){onDown(e.clientX,e.
 window.addEventListener('mouseup',function(e){onUp(e);});
 renderer.domElement.addEventListener('mousemove',function(e){onMove(e.clientX,e.clientY);});
 renderer.domElement.addEventListener('wheel',function(e){if(soloMode)soloDist=Math.max(1.2,Math.min(8,soloDist+e.deltaY*.006));else camDist=Math.max(4,Math.min(20,camDist+e.deltaY*.012));},{passive:true});
-renderer.domElement.addEventListener('touchstart',function(e){onDown(e.touches[0].clientX,e.touches[0].clientY,e.touches.length>1);},{passive:true});
-window.addEventListener('touchend',function(e){onUp(e.changedTouches?e.changedTouches[0]:e);});
-renderer.domElement.addEventListener('touchmove',function(e){if(!e.touches.length)return;if(e.touches.length>1)shiftHeld=true;onMove(e.touches[0].clientX,e.touches[0].clientY);},{passive:true});
+/* Touch: 1 finger = orbit/place/pipe · 2 fingers = pinch-zoom + pan */
+var pinchD=0,pinchMid=null;
+function _tDist(e){var a=e.touches[0],b=e.touches[1];return Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);}
+function _tMid(e){var a=e.touches[0],b=e.touches[1];return {x:(a.clientX+b.clientX)/2,y:(a.clientY+b.clientY)/2};}
+renderer.domElement.addEventListener('touchstart',function(e){
+  if(e.touches.length===2){isDrag=false;piping=false;pinchD=_tDist(e);pinchMid=_tMid(e);}
+  else if(e.touches.length===1){onDown(e.touches[0].clientX,e.touches[0].clientY,false);}
+},{passive:false});
+renderer.domElement.addEventListener('touchmove',function(e){
+  if(e.touches.length===2){
+    e.preventDefault();
+    var d=_tDist(e),mid=_tMid(e);
+    if(pinchD){var f=(pinchD-d)*.012;
+      if(soloMode)soloDist=Math.max(1.2,Math.min(8,soloDist+f));
+      else camDist=Math.max(4,Math.min(20,camDist+f));}
+    if(pinchMid&&soloMode){panX+=-(mid.x-pinchMid.x)*soloDist*.0016;panY+=(mid.y-pinchMid.y)*soloDist*.0016;}
+    pinchD=d;pinchMid=mid;
+  }else if(e.touches.length===1){onMove(e.touches[0].clientX,e.touches[0].clientY);}
+},{passive:false});
+window.addEventListener('touchend',function(e){pinchD=0;pinchMid=null;onUp(e.changedTouches?e.changedTouches[0]:e);});
 window.addEventListener('resize',function(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 renderer.domElement.addEventListener('dblclick',resetCam);
 
@@ -924,11 +951,13 @@ function submitOrder(){
 (function(){
   var id=new URLSearchParams(location.search).get('order');
   if(!id)return;
-  fetch('/api/orders/'+id).then(function(r){return r.json();}).then(function(o){
+  fetch('/api/order?id='+encodeURIComponent(id)).then(function(r){return r.json();}).then(function(o){
     if(o&&o.design){loadDesign(o.design);
       var el=document.getElementById('order-loaded');el.style.display='block';
       el.textContent='✓ Loaded order '+o.orderId+(o.customer&&o.customer.name?' — '+o.customer.name:'');}
   }).catch(function(){});
 })();
 
+// On phones/tablets, start with the sidebar tucked away so the cake is visible
+if(innerWidth<820){document.getElementById('side').classList.add('closed');}
 setTimeout(function(){tLid=-Math.PI*.72;},700);loadUI();animate();initDrawCanvas();

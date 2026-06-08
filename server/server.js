@@ -26,7 +26,7 @@ const crypto = require('crypto');
   } catch (e) { /* ignore */ }
 })();
 
-const store = require('./store');
+const store = require('../lib/store');
 
 const PORT           = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;   // override in server/.env
@@ -143,21 +143,23 @@ const server = http.createServer(async (req, res) => {
         return send(res, 200, await store.list());
       }
 
-      // get one full order (used to re-open a design)
-      const one = p.match(/^\/api\/orders\/([^/]+)$/);
-      if (one && req.method === 'GET') {
-        const o = await store.get(one[1]);
+      // get one full order (used to re-open a design) — /api/order?id=…
+      if (p === '/api/order' && req.method === 'GET') {
+        const id = url.searchParams.get('id');
+        if (!id) return send(res, 400, { error: 'Missing id' });
+        const o = await store.get(id);
         return o ? send(res, 200, o) : send(res, 404, { error: 'Not found' });
       }
 
-      // update status (admin only) — only a known status value is accepted
-      const st = p.match(/^\/api\/orders\/([^/]+)\/status$/);
-      if (st && req.method === 'PATCH') {
+      // update status (admin only) — /api/status?id=…
+      if (p === '/api/status' && req.method === 'PATCH') {
         if (!isAdmin(req)) return send(res, 401, { error: 'Unauthorized' });
+        const id = url.searchParams.get('id');
         const b = await readBody(req);
         const ALLOWED = ['pending', 'baking', 'ready', 'collected', 'cancelled'];
+        if (!id) return send(res, 400, { error: 'Missing id' });
         if (ALLOWED.indexOf(b.status) === -1) return send(res, 400, { error: 'Invalid status' });
-        const ok = await store.updateStatus(st[1], b.status);
+        const ok = await store.updateStatus(id, b.status);
         return ok ? send(res, 200, { ok: true }) : send(res, 404, { error: 'Not found' });
       }
 
@@ -171,7 +173,7 @@ const server = http.createServer(async (req, res) => {
 
   /* ─────────── static files ─────────── */
   if (req.method !== 'GET' && req.method !== 'HEAD') return send(res, 405, 'Method not allowed', 'text/plain');
-  let rel = p === '/' ? '/celestial_box_3d.html' : p;
+  let rel = p === '/' ? '/index.html' : p;
   if (p === '/admin') rel = '/admin.html';
   let file;
   try { file = path.join(PUBLIC_DIR, decodeURIComponent(rel)); }
