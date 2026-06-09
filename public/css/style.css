@@ -559,7 +559,8 @@ body:not(.editing) #hint{display:none} /* box view uses tray; hint only in solo 
    DECORATION PREVIEW
    ════════════════════════════════════════════════════════════ */
 .preview-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
-#dec-preview{width:150px;height:150px;border-radius:var(--r-md);
+#dec-preview{position:static;top:auto;left:auto;  /* opt out of global canvas{position:fixed} */
+  width:150px;height:150px;border-radius:var(--r-md);
   border:1px solid var(--panel-edge);
   background:radial-gradient(circle at 50% 36%,rgba(36,48,80,0.55),rgba(10,14,26,0.55))}
 .preview-cap{font-size:8.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--text-4)}
