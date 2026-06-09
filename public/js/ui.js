@@ -110,6 +110,36 @@
     document.querySelectorAll('.ed-sec').forEach(function(p){
       p.classList.toggle('on',p.dataset.sec===s);
     });
+    if(s==='decor'&&window.updatePreview)updatePreview();   // render the live decoration preview
+  };
+
+  /* ════════════════════ box & card panel ════════════════════ */
+  function buildBoxSwatches(){
+    [['box-swatches','boxpick',window.setBoxColor],['lid-swatches','lidpick',window.setLidColor]].forEach(function(cfg){
+      var wrap=$(cfg[0]);if(!wrap)return;wrap.innerHTML='';
+      (window.SWATCHES||[]).forEach(function(s){
+        var el=document.createElement('div');el.className='cs';el.style.background=s[0];el.title=s[1];
+        el.onclick=function(){cfg[2](s[0]);$(cfg[1]).value=s[0];
+          wrap.querySelectorAll('.cs').forEach(function(e){e.classList.remove('on');});el.classList.add('on');};
+        wrap.appendChild(el);
+      });
+    });
+  }
+  window.openBoxPanel=function(){
+    if(window.tLid===0&&typeof openLid==='function')openLid();   // raise lid so the card shows
+    var lb=$('lid-btn');if(lb)lb.classList.add('on');
+    var p=$('boxpanel');if(p)p.classList.add('open');
+  };
+  window.closeBoxPanel=function(){var p=$('boxpanel');if(p)p.classList.remove('open');};
+  window.updateCard=function(){
+    if(typeof cardData==='undefined')return;
+    cardData.l1=$('card-l1').value;cardData.l2=$('card-l2').value;cardData.sub=$('card-sub').value;
+    if(window.rebuildCard)rebuildCard();
+  };
+  window.updateLid=function(){
+    if(typeof lidData==='undefined')return;
+    lidData.title=$('lid-title').value;lidData.msg=$('lid-msg').value;lidData.sub=$('lid-sub').value;
+    if(window.rebuildLid)rebuildLid();
   };
 
   /* ── lid toggle (engine tracks tLid) ── */
@@ -147,6 +177,7 @@
   /* ════════════════════ init ════════════════════ */
   buildFlavorCards();
   buildToppingCards();
+  buildBoxSwatches();
 
   // Keep the tray dots/labels live with every rebuild
   if(typeof window.buildCake==='function'){

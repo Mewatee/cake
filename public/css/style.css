@@ -538,3 +538,51 @@ body:not(.editing) #hint{display:none} /* box view uses tray; hint only in solo 
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms !important;transition-duration:.01ms !important}
 }
+
+/* ════════════════════════════════════════════════════════════
+   LANDING (onboard extras)
+   ════════════════════════════════════════════════════════════ */
+.ob-inner{max-width:540px}
+#onboard .ob-kicker{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+#onboard p{margin-top:14px;font-size:12px;letter-spacing:1.5px;text-transform:none;color:var(--text-2)}
+.ob-feats{display:flex;gap:10px;justify-content:center;margin:30px auto 4px;flex-wrap:wrap}
+.ob-feat{width:150px;padding:16px 12px;border-radius:var(--r-md);
+  background:var(--ink-1);border:1px solid var(--panel-edge);backdrop-filter:blur(14px);
+  display:flex;flex-direction:column;align-items:center;gap:5px}
+.ob-feat span{font-size:18px;color:var(--gold-bright)}
+.ob-feat b{font-family:var(--display);font-size:15px;font-weight:400;letter-spacing:1px}
+.ob-feat small{font-size:9.5px;letter-spacing:.4px;color:var(--text-3);text-align:center;line-height:1.4}
+.ob-foot{margin-top:22px;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-4)}
+@media (max-width:600px){ .ob-feats{display:none} }
+
+/* ════════════════════════════════════════════════════════════
+   DECORATION PREVIEW
+   ════════════════════════════════════════════════════════════ */
+.preview-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+#dec-preview{width:150px;height:150px;border-radius:var(--r-md);
+  border:1px solid var(--panel-edge);
+  background:radial-gradient(circle at 50% 36%,rgba(36,48,80,0.55),rgba(10,14,26,0.55))}
+.preview-cap{font-size:8.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--text-4)}
+
+/* ════════════════════════════════════════════════════════════
+   BOX & CARD DRAWER (right side, scene stays visible)
+   ════════════════════════════════════════════════════════════ */
+#boxpanel{
+  position:fixed;top:0;right:0;bottom:0;width:340px;max-width:88vw;z-index:40;
+  background:var(--ink-2);backdrop-filter:blur(22px) saturate(1.1);
+  border-left:1px solid var(--panel-edge);box-shadow:var(--shadow-panel);
+  transform:translateX(100%);transition:transform .42s var(--ease);
+  display:flex;flex-direction:column;
+}
+#boxpanel.open{transform:none}
+.bp-head{display:flex;align-items:center;justify-content:space-between;
+  padding:20px 20px 16px;border-bottom:1px solid var(--line)}
+.bp-head .t{display:flex;flex-direction:column;line-height:1.1}
+.bp-head .t small{font-size:8.5px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
+.bp-head .t b{font-family:var(--display);font-weight:400;font-size:20px;letter-spacing:1px}
+.bp-x{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;
+  background:var(--gold-08);border:1px solid var(--panel-edge);color:var(--text-2)}
+.bp-x svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.8;fill:none}
+.bp-x:hover{color:var(--gold-bright);border-color:var(--gold-35)}
+.bp-body{flex:1;overflow-y:auto;padding:18px 20px 26px}
+@media (max-width:600px){ #boxpanel{width:100%;max-width:100%} }

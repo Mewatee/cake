@@ -14,13 +14,20 @@
 <!-- ═══ CELESTIAL VIGNETTE (frames the 3D scene) ═══ -->
 <div id="vignette"></div>
 
-<!-- ═══ ONBOARD ═══ -->
+<!-- ═══ ONBOARD / LANDING ═══ -->
 <div id="onboard">
- <div>
+ <div class="ob-inner">
   <div class="mk">✦</div>
+  <div class="ob-kicker">Céleste Atelier</div>
   <h1>Celestial Bento</h1>
-  <p>Cake Atelier</p>
+  <p>Design a four-cake gift box among the stars</p>
+  <div class="ob-feats">
+   <div class="ob-feat"><span>✶</span><b>Sculpt</b><small>Frosting · flavour · toppings</small></div>
+   <div class="ob-feat"><span>✎</span><b>Decorate</b><small>Place · pipe · draw your own</small></div>
+   <div class="ob-feat"><span>✦</span><b>Reserve</b><small>Send the box as an order</small></div>
+  </div>
   <button class="go" onclick="dismissOnboard()">Begin Designing</button>
+  <div class="ob-foot">Works on desktop, phone &amp; tablet</div>
  </div>
 </div>
 
@@ -40,6 +47,9 @@
  </button>
  <button class="vbtn" data-tip="Reset view" onclick="resetCam()" aria-label="Reset view">
   <svg viewBox="0 0 24 24"><path d="M3 7V4h3"/><path d="M21 7V4h-3"/><path d="M3 17v3h3"/><path d="M21 17v3h-3"/></svg>
+ </button>
+ <button class="vbtn" data-tip="Box &amp; card" onclick="openBoxPanel()" aria-label="Customise box and card">
+  <svg viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4 8 4 8-4z"/><path d="M4 7v10l8 4 8-4V7"/><path d="M12 11v10"/></svg>
  </button>
  <div class="vdiv"></div>
  <button id="order-btn" onclick="openOrder()">
@@ -165,6 +175,13 @@
     <div class="dec-grid" id="dec-grid"></div>
    </div>
    <div class="field">
+    <div class="lab">Preview</div>
+    <div class="preview-wrap">
+     <canvas id="dec-preview" width="150" height="150"></canvas>
+     <div class="preview-cap">Size &amp; rotation shown live</div>
+    </div>
+   </div>
+   <div class="field">
     <div class="lab">Decoration Colour</div>
     <div class="dcol-row" id="dcol-row"></div>
     <div class="cpick-row">
@@ -172,9 +189,9 @@
      <span>Custom colour</span>
     </div>
     <div class="slider-row"><span class="sl-lab">Size</span>
-     <input type="range" id="dec-size" min="0.5" max="2" step="0.1" value="1" oninput="decorScale=parseFloat(this.value)"></div>
+     <input type="range" id="dec-size" min="0.5" max="2" step="0.1" value="1" oninput="decorScale=parseFloat(this.value);if(window.updatePreview)updatePreview()"></div>
     <div class="slider-row"><span class="sl-lab">Rotate</span>
-     <input type="range" id="dec-rot" min="0" max="360" step="15" value="0" oninput="decorRot=parseFloat(this.value)*Math.PI/180"></div>
+     <input type="range" id="dec-rot" min="0" max="360" step="15" value="0" oninput="decorRot=parseFloat(this.value)*Math.PI/180;if(window.updatePreview)updatePreview()"></div>
     <div class="actrow">
      <button class="act" onclick="undoDecor()">
       <svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>Undo</button>
@@ -217,6 +234,47 @@
   <option value="floral">Floral</option><option value="constellation">Constellation</option>
   <option value="heart">Heart</option><option value="plain">Plain</option>
  </select>
+</div>
+
+<!-- ═══ BOX & CARD PANEL (right drawer — scene stays visible for live preview) ═══ -->
+<div id="boxpanel">
+ <div class="bp-head">
+  <div class="t"><small>Customise</small><b>Box &amp; Card</b></div>
+  <button class="bp-x" onclick="closeBoxPanel()" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg></button>
+ </div>
+ <div class="bp-body">
+  <div class="field">
+   <div class="lab">Box Colour</div>
+   <div class="colors" id="box-swatches"></div>
+   <div class="cpick-row"><input type="color" id="boxpick" value="#8ab8d0" onchange="setBoxColor(this.value)"><span>Custom colour</span></div>
+  </div>
+  <div class="field">
+   <div class="lab">Lid Colour</div>
+   <div class="colors" id="lid-swatches"></div>
+   <div class="cpick-row"><input type="color" id="lidpick" value="#9ecce0" onchange="setLidColor(this.value)"><span>Custom colour</span></div>
+  </div>
+  <div class="field">
+   <div class="lab">Greeting Card</div>
+   <span class="minilab">Line 1</span><input class="txt" type="text" id="card-l1" value="Happy" oninput="updateCard()">
+   <span class="minilab">Line 2</span><input class="txt" type="text" id="card-l2" value="Birthday" oninput="updateCard()">
+   <span class="minilab">Message</span><input class="txt" type="text" id="card-sub" value="to a year full of wonder" oninput="updateCard()">
+  </div>
+  <div class="field">
+   <div class="lab">Lid Interior</div>
+   <span class="minilab">Background colour</span>
+   <div class="cpick-row"><input type="color" id="lidbg-pick" value="#192840" onchange="setLidBg(this.value)"><span>Interior colour</span></div>
+   <span class="minilab">Portrait photo</span>
+   <input type="file" id="lid-photo-input" accept="image/*" onchange="uploadLidPhoto(this)" style="display:none">
+   <div class="uploader" onclick="document.getElementById('lid-photo-input').click()">
+    <div class="ttl">⬆ Upload portrait photo</div>
+    <div class="sub" id="lid-photo-status">No photo — celestial silhouette shown.</div>
+   </div>
+   <button class="act danger wide" id="lid-photo-remove" style="display:none;margin-top:8px" onclick="removeLidPhoto()">Remove photo</button>
+   <span class="minilab" style="margin-top:12px">Portrait title</span><input class="txt" type="text" id="lid-title" value="STAR-GAZER" oninput="updateLid()">
+   <span class="minilab">Message</span><input class="txt" type="text" id="lid-msg" value="Happy Birthday" oninput="updateLid()">
+   <span class="minilab">Wish</span><input class="txt" type="text" id="lid-sub" value="Wishing you a year full of wonders." oninput="updateLid()">
+  </div>
+ </div>
 </div>
 
 <!-- ═══ ORDER MODAL ═══ -->

@@ -6,6 +6,10 @@ var CPOS=[[-1.12,-.85],[1.12,-.85],[-1.12,.85],[1.12,.85]];
 /* ═══ STATE ═══ */
 var cur=0,soloMode=false,spinning=false,decorMode=false,deleteMode=false,selDec='rosette',decorScale=1,decorRot=0,decorColor='#f4b8c8';
 var CAKE_NAMES=['Top Left','Top Right','Bot Left','Bot Right'];
+// Customizable box + greeting card + lid interior (global, not per-cake)
+var cardData={l1:'Happy',l2:'Birthday',sub:'to a year full of wonder'};
+var lidData={title:'STAR-GAZER',msg:'Happy Birthday',sub:'Wishing you a year full of wonders.',bg:'#192840',photo:null,photoSrc:null};
+var boxColorHex='#8ab8d0', lidColorHex='#9ecce0';
 var SWATCHES=[['#aaccdf','Sky Blue'],['#92b8d4','Steel'],['#c2dcea','Ice'],['#b5d5c5','Sage'],['#a8d8a8','Mint'],['#d8e8c0','Pistachio'],['#f2c4c8','Rose'],['#e8a0aa','Berry'],['#f5b0b0','Coral'],['#c8b4d8','Lavender'],['#d8a8d0','Orchid'],['#f5dfc0','Peach'],['#f0d0a0','Apricot'],['#f8e8b0','Butter'],['#e0c0d0','Blush'],['#d4d4d4','White'],['#c8b090','Caramel'],['#404040','Charcoal']];
 var DECOL=[['#f4b8c8','Pink'],['#f8e8d0','Cream'],['#f0f0f0','White'],['#d0b8f0','Lavender'],['#88d8c0','Mint'],['#8B5530','Choc']];
 // Cake flavours — sponge colour shown as the exposed crumb band at the base
@@ -106,7 +110,7 @@ function uploadPhoto(inp){
 }
 function removePhoto(){cakeData[cur].photo=null;cakeData[cur].photoSrc=null;updatePhotoRow();buildCake(cur);}
 function pickRGB(hex){cakeData[cur].color=hex;document.querySelectorAll('.cs').forEach(function(s){s.classList.remove('on');});buildCake(cur);}
-function setDecorColor(hex){decorColor=hex;document.querySelectorAll('.dcol').forEach(function(e){e.classList.remove('on');});document.getElementById('decpick').value=hex;}
+function setDecorColor(hex){decorColor=hex;document.querySelectorAll('.dcol').forEach(function(e){e.classList.remove('on');});document.getElementById('decpick').value=hex;if(window.updatePreview)updatePreview();}
 function undoDecor(){if(cakeData[cur].decorations.length){cakeData[cur].decorations.pop();buildCake(cur);}}
 function clearDecor(){cakeData[cur].decorations=[];buildCake(cur);}
 function toggleDelete(){deleteMode=!deleteMode;document.getElementById('btn-del').classList.toggle('active',deleteMode);document.getElementById('mode-badge').textContent=deleteMode?'DELETE MODE — Click near decoration to remove':'DECORATE MODE — Click cake to place';}
@@ -132,6 +136,7 @@ function toggleDelete(){deleteMode=!deleteMode;document.getElementById('btn-del'
       if(def){setDecorColor(def);}
       if(!deleteMode){var mb=document.getElementById('mode-badge');
         mb.textContent=dt.id==='whipcream'?'WHIP CREAM — Drag on cake to pipe':(dt.id==='custom'?'CUSTOM — Click cake, then draw':'DECORATE MODE — Click cake to place');}
+      if(window.updatePreview)updatePreview();
     };
     grid.appendChild(el);
   });
@@ -141,7 +146,7 @@ function toggleDelete(){deleteMode=!deleteMode;document.getElementById('btn-del'
   DECOL.forEach(function(s){
     var el=document.createElement('div');el.className='dcol'+(s[0]===decorColor?' on':'');
     el.style.background=s[0];el.title=s[1];
-    el.onclick=function(){decorColor=s[0];document.getElementById('decpick').value=s[0];document.querySelectorAll('.dcol').forEach(function(e){e.classList.remove('on');});el.classList.add('on');};
+    el.onclick=function(){decorColor=s[0];document.getElementById('decpick').value=s[0];document.querySelectorAll('.dcol').forEach(function(e){e.classList.remove('on');});el.classList.add('on');if(window.updatePreview)updatePreview();};
     row.appendChild(el);
   });
 })();
@@ -313,7 +318,7 @@ function topTex(d){return tex(512,512,function(c,w,h){var hl=h2l(d.color);var g=
     if(d.t3)softText(c,d.t3,w/2,h-12,'600 16px serif','#9a7a3a');
   }
   });}
-function lidTex(){return tex(600,400,function(c,w,h){c.fillStyle='#192840';c.fillRect(0,0,w,h);for(var i=0;i<50;i++){c.beginPath();c.arc(Math.random()*w,Math.random()*h,Math.random()*1.2+.4,0,Math.PI*2);c.fillStyle='rgba(184,200,232,'+(Math.random()*.25+.1)+')';c.fill();}c.strokeStyle='#c9a84c';c.lineWidth=2.5;c.strokeRect(8,8,w-16,h-16);var fx=210,fy=22,fw=180,fh=238;c.fillStyle='#142038';c.strokeStyle='#c9a84c';c.lineWidth=2.5;rr(c,fx,fy,fw,fh,8);c.fill();c.stroke();c.beginPath();c.ellipse(fx+fw/2,fy+fh/2+4,54,68,0,0,Math.PI*2);c.fillStyle='#283858';c.fill();c.strokeStyle='#c9a84c';c.lineWidth=1.5;c.stroke();c.beginPath();c.arc(fx+fw/2,fy+fh/2-14,24,0,Math.PI*2);c.fillStyle='#5a78a0';c.fill();c.beginPath();c.ellipse(fx+fw/2,fy+fh/2+28,30,22,0,Math.PI,0,true);c.fill();c.fillStyle='#c9a84c';c.textAlign='center';c.font='bold 11px serif';c.fillText('THE CELESTIAL',fx+fw/2,fy+fh+16);c.fillText('STAR-GAZER',fx+fw/2,fy+fh+30);c.fillStyle='#e0c870';c.font='italic 16px serif';c.fillText('Happy Birthday \u2661',w/2,316);c.fillStyle='#8898b8';c.font='11px serif';c.fillText('Wishing you a year full of wonders.',w/2,336);ds(c,155,285,8,5,'#c9a84c');ds(c,455,275,6,5,'rgba(201,168,76,0.5)');});}
+function lidTex(){return tex(600,400,function(c,w,h){c.fillStyle=lidData.bg||'#192840';c.fillRect(0,0,w,h);for(var i=0;i<50;i++){c.beginPath();c.arc(Math.random()*w,Math.random()*h,Math.random()*1.2+.4,0,Math.PI*2);c.fillStyle='rgba(184,200,232,'+(Math.random()*.25+.1)+')';c.fill();}c.strokeStyle='#c9a84c';c.lineWidth=2.5;c.strokeRect(8,8,w-16,h-16);var fx=210,fy=22,fw=180,fh=238;c.fillStyle='#142038';c.strokeStyle='#c9a84c';c.lineWidth=2.5;rr(c,fx,fy,fw,fh,8);c.fill();c.stroke();var ecx=fx+fw/2,ecy=fy+fh/2+4,erx=54,ery=68;c.beginPath();c.ellipse(ecx,ecy,erx,ery,0,0,Math.PI*2);c.fillStyle='#283858';c.fill();if(lidData.photo&&lidData.photo.width){c.save();c.beginPath();c.ellipse(ecx,ecy,erx,ery,0,0,Math.PI*2);c.clip();var par=lidData.photo.width/lidData.photo.height,ptr=erx/ery,pdw,pdh;if(par>ptr){pdh=ery*2;pdw=pdh*par;}else{pdw=erx*2;pdh=pdw/par;}c.drawImage(lidData.photo,ecx-pdw/2,ecy-pdh/2,pdw,pdh);c.restore();}else{c.beginPath();c.arc(ecx,ecy-14,24,0,Math.PI*2);c.fillStyle='#5a78a0';c.fill();c.beginPath();c.ellipse(ecx,ecy+28,30,22,0,Math.PI,0,true);c.fill();}c.strokeStyle='#c9a84c';c.lineWidth=1.5;c.beginPath();c.ellipse(ecx,ecy,erx,ery,0,0,Math.PI*2);c.stroke();c.fillStyle='#c9a84c';c.textAlign='center';c.font='bold 11px serif';c.fillText('THE CELESTIAL',fx+fw/2,fy+fh+16);if(lidData.title)c.fillText(lidData.title,fx+fw/2,fy+fh+30);c.fillStyle='#e0c870';c.font='italic 16px serif';if(lidData.msg)c.fillText(lidData.msg+' \u2661',w/2,316);c.fillStyle='#8898b8';c.font='11px serif';if(lidData.sub)c.fillText(lidData.sub,w/2,336);ds(c,155,285,8,5,'#c9a84c');ds(c,455,275,6,5,'rgba(201,168,76,0.5)');});}
 
 // Greeting card front (portrait) — celestial parchment with crescent + message
 function cardTex(){return tex(360,440,function(c,w,h){
@@ -328,9 +333,12 @@ function cardTex(){return tex(360,440,function(c,w,h){
   c.fillStyle=bg;c.beginPath();c.arc(mx+MR*.5,my-MR*.05,MR*.92,0,Math.PI*2);c.fill();
   ds(c,mx-66,my+8,7,5,'#c9a84c');ds(c,mx+70,my-6,6,5,'#c9a84c');ds(c,mx+40,my-52,5,5,'rgba(201,168,76,0.7)');
   c.fillStyle='#5e4f37';c.textAlign='center';
-  c.font='italic 700 40px serif';c.fillText('Happy',w/2,242);c.fillText('Birthday',w/2,288);
+  c.font='italic 700 40px serif';
+  if(cardData.l1)c.fillText(cardData.l1,w/2,242);
+  if(cardData.l2)c.fillText(cardData.l2,w/2,288);
   goldDivider(c,w/2,322,92);
-  c.fillStyle='#9a7a3a';c.font='italic 17px serif';c.fillText('to a year full of wonder',w/2,352);
+  c.fillStyle='#9a7a3a';c.font='italic 17px serif';
+  if(cardData.sub)c.fillText(cardData.sub,w/2,352);
   c.fillStyle='#8a6a3a';c.font='20px serif';c.fillText('✦   ☾   ✦',w/2,402);
 });}
 
@@ -610,6 +618,71 @@ var cardEdge=new THREE.MeshStandardMaterial({color:0xeadfc6,roughness:.85});
 var cardMesh=new THREE.Mesh(new THREE.BoxGeometry(cardW,cardH,.04),[cardEdge,cardEdge,cardEdge,cardEdge,cardFront,cardEdge]);
 cardMesh.position.set(0,cardH/2,0);cardMesh.castShadow=true;cardPivot.add(cardMesh);
 cardPivot.rotation.x=Math.PI/2; // start folded flat (hidden under the closed lid)
+
+/* ═══ BOX / CARD CUSTOMIZATION HOOKS (called from the UI) ═══ */
+function setBoxColor(hex){boxColorHex=hex;boxMat.color.set(hex);rimMat.color.set(hex);}
+function setLidColor(hex){lidColorHex=hex;lidOM.color.set(hex);}
+function rebuildCard(){if(cardFront){cardFront.map=cardTex();cardFront.needsUpdate=true;}}
+function rebuildLid(){if(lidIM){lidIM.map=lidTex();lidIM.needsUpdate=true;}}
+function setLidBg(hex){lidData.bg=hex;rebuildLid();}
+function uploadLidPhoto(inp){
+  var f=inp.files&&inp.files[0];if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(ev){
+    var img=new Image();
+    img.onload=function(){
+      var M=900,sc=Math.min(1,M/Math.max(img.width,img.height));
+      var cw=Math.max(1,Math.round(img.width*sc)),ch=Math.max(1,Math.round(img.height*sc));
+      var cv=document.createElement('canvas');cv.width=cw;cv.height=ch;cv.getContext('2d').drawImage(img,0,0,cw,ch);
+      var durl;try{durl=cv.toDataURL('image/jpeg',0.85);}catch(e){durl=ev.target.result;}
+      var fin=new Image();
+      fin.onload=function(){lidData.photo=fin;lidData.photoSrc=durl;rebuildLid();
+        var s=document.getElementById('lid-photo-status');if(s)s.textContent='✓ Photo set. Tap to replace.';
+        var r=document.getElementById('lid-photo-remove');if(r)r.style.display='block';};
+      fin.src=durl;
+    };
+    img.src=ev.target.result;
+  };
+  rd.readAsDataURL(f);inp.value='';
+}
+function removeLidPhoto(){lidData.photo=null;lidData.photoSrc=null;rebuildLid();
+  var s=document.getElementById('lid-photo-status');if(s)s.textContent='No photo — celestial silhouette shown.';
+  var r=document.getElementById('lid-photo-remove');if(r)r.style.display='none';}
+window.setBoxColor=setBoxColor;window.setLidColor=setLidColor;window.rebuildCard=rebuildCard;window.rebuildLid=rebuildLid;
+window.setLidBg=setLidBg;window.uploadLidPhoto=uploadLidPhoto;window.removeLidPhoto=removeLidPhoto;
+
+/* ═══ DECORATION PREVIEW (mini renderer shown in the Decor panel) ═══ */
+var pvR,pvScene,pvCam,pvGroup;
+function decMat(type,col){
+  if(type==='candle'||!col)return null;
+  var lc=col.toLowerCase();
+  var metal=(type==='moon'&&lc==='#c2cdd8')||(type==='starflat'&&lc==='#c9a84c');
+  return new THREE.MeshStandardMaterial({color:new THREE.Color(col),roughness:metal?.24:.62,metalness:metal?.72:.08});
+}
+function initPreview(){
+  var cv=document.getElementById('dec-preview');if(!cv)return false;
+  pvR=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true});
+  pvR.setPixelRatio(Math.min(devicePixelRatio,2));pvR.setSize(cv.width,cv.height,false);
+  pvScene=new THREE.Scene();
+  pvCam=new THREE.PerspectiveCamera(40,1,.05,10);pvCam.position.set(0,.36,.6);pvCam.lookAt(0,.05,0);
+  pvScene.add(new THREE.AmbientLight(0xffffff,.95));
+  var l=new THREE.DirectionalLight(0xfff6e8,.9);l.position.set(1.2,2,1.5);pvScene.add(l);
+  pvGroup=new THREE.Group();pvScene.add(pvGroup);
+  return true;
+}
+function updatePreview(){
+  if(!pvR&&!initPreview())return;
+  while(pvGroup.children.length)pvGroup.remove(pvGroup.children[0]);
+  var type=selDec;
+  if(type==='whipcream'){
+    mk3Dwhip(pvGroup,[{x:-.16,z:0},{x:0,z:0},{x:.16,z:0}],decorScale,
+      new THREE.MeshStandardMaterial({color:new THREE.Color(decorColor||'#fbf6ec'),roughness:.86,metalness:.02}));
+  }else if(type&&type!=='custom'&&type!=='delete'&&DECOR_FN[type]){
+    DECOR_FN[type](pvGroup,0,0,0,decorScale,decMat(type,decorColor),decorRot,'dome',null);
+  }
+  pvR.render(pvScene,pvCam);
+}
+window.updatePreview=updatePreview;
 
 /* ═══ SCATTERED CHARMS ═══ */
 [[-3.4,-2.1,.13],[3.1,-1.7,.11],[-2.7,2.4,.1],[3.4,2.1,.12]].forEach(function(p){var pts=[];for(var i=0;i<10;i++){var a=i*Math.PI/5-Math.PI/2,r=i%2===0?p[2]:p[2]*.38;pts.push(new THREE.Vector2(Math.cos(a)*r,Math.sin(a)*r));}var m=new THREE.Mesh(new THREE.ExtrudeGeometry(new THREE.Shape(pts),{depth:.02,bevelEnabled:false}),goldMat);m.position.set(p[0],-BH/2-.02,p[1]);m.rotation.x=-Math.PI/2;scatterGrp.add(m);});
@@ -900,26 +973,49 @@ function animate(){
 /* ═══ ORDER SAVE / LOAD ═══ */
 // Serialize all 4 cakes to plain JSON (photos kept as data-URLs)
 function serializeDesign(){
-  return {cakes:cakeData.map(function(d){
-    return {color:d.color,finish:d.finish,flavor:d.flavor,top:d.top,
-      t1:d.t1,t2:d.t2,t3:d.t3,
-      decorations:d.decorations||[],
-      photoSrc:d.photoSrc||null};
-  })};
+  return {
+    box:{color:boxColorHex,lid:lidColorHex},
+    card:{l1:cardData.l1,l2:cardData.l2,sub:cardData.sub},
+    lid:{title:lidData.title,msg:lidData.msg,sub:lidData.sub,bg:lidData.bg,photoSrc:lidData.photoSrc||null},
+    cakes:cakeData.map(function(d){
+      return {color:d.color,finish:d.finish,flavor:d.flavor,top:d.top,
+        t1:d.t1,t2:d.t2,t3:d.t3,
+        decorations:d.decorations||[],
+        photoSrc:d.photoSrc||null};
+    })};
 }
+// Only accept inline image data-URLs from saved orders (block remote URLs / non-image
+// data: payloads — orders are public, so photoSrc is untrusted when reopened).
+function safePhoto(src){return (typeof src==='string'&&/^data:image\/(png|jpe?g|gif|webp);/i.test(src))?src:null;}
 // Restore a saved design into the 4 cakes and rebuild
 function loadDesign(design){
   if(!design||!design.cakes)return;
+  // box + card customization
+  if(design.box){setBoxColor(design.box.color||boxColorHex);setLidColor(design.box.lid||lidColorHex);}
+  if(design.card){cardData.l1=design.card.l1||'';cardData.l2=design.card.l2||'';cardData.sub=design.card.sub||'';rebuildCard();}
+  if(design.lid){lidData.title=design.lid.title||'';lidData.msg=design.lid.msg||'';lidData.sub=design.lid.sub||'';
+    lidData.bg=design.lid.bg||lidData.bg;lidData.photoSrc=safePhoto(design.lid.photoSrc);lidData.photo=null;
+    if(lidData.photoSrc){var lim=new Image();lim.onload=function(){lidData.photo=lim;rebuildLid();};lim.src=lidData.photoSrc;}
+    rebuildLid();}
   design.cakes.forEach(function(s,i){
     if(i>3)return;var d=cakeData[i];
     d.color=s.color||d.color;d.finish=s.finish||d.finish;d.flavor=s.flavor||d.flavor;
     d.top=s.top||d.top;d.t1=s.t1||'';d.t2=s.t2||'';d.t3=s.t3||'';
     d.decorations=s.decorations||[];
-    d.photoSrc=s.photoSrc||null;d.photo=null;
-    if(s.photoSrc){(function(idx,src){var im=new Image();im.onload=function(){cakeData[idx].photo=im;buildCake(idx);};im.src=src;})(i,s.photoSrc);}
+    d.photoSrc=safePhoto(s.photoSrc);d.photo=null;
+    if(d.photoSrc){(function(idx,src){var im=new Image();im.onload=function(){cakeData[idx].photo=im;buildCake(idx);};im.src=src;})(i,d.photoSrc);}
     buildCake(i);
   });
   loadUI();
+  // reflect box/card into the panel inputs if present
+  var q=function(id){return document.getElementById(id);};
+  if(q('boxpick')&&design.box)q('boxpick').value=design.box.color||boxColorHex;
+  if(q('lidpick')&&design.box)q('lidpick').value=design.box.lid||lidColorHex;
+  if(q('card-l1')&&design.card){q('card-l1').value=cardData.l1;q('card-l2').value=cardData.l2;q('card-sub').value=cardData.sub;}
+  if(q('lid-title')&&design.lid){q('lid-title').value=lidData.title;q('lid-msg').value=lidData.msg;q('lid-sub').value=lidData.sub;}
+  if(q('lidbg-pick')&&design.lid)q('lidbg-pick').value=lidData.bg;
+  if(q('lid-photo-remove'))q('lid-photo-remove').style.display=lidData.photoSrc?'block':'none';
+  if(q('lid-photo-status'))q('lid-photo-status').textContent=lidData.photoSrc?'✓ Photo set. Tap to replace.':'No photo — celestial silhouette shown.';
 }
 
 function openOrder(){
