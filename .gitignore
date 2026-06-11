@@ -4,3 +4,4 @@ server/orders.json
 .env
 *.log
 *.md
+!CLAUDE.md
