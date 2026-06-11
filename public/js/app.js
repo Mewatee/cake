@@ -1,4 +1,6 @@
 /* ═══ CONSTANTS ═══ */
+var _TW='https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/';
+function _ei(cp){return '<img class="emo" src="'+_TW+cp+'.svg" alt="">';}
 var BW=4.6,BH=1.3,BD=3.6,CW=1.95,CH=0.82,CD=1.5;
 var BODY_CY=-BH/2+.04+CH/2, BODY_TOP=BODY_CY+CH/2, BORDER_Y=BODY_TOP+.015;
 var CPOS=[[-1.12,-.85],[1.12,-.85],[-1.12,.85],[1.12,.85]];
@@ -14,24 +16,24 @@ var SWATCHES=[['#aaccdf','Sky Blue'],['#92b8d4','Steel'],['#c2dcea','Ice'],['#b5
 var DECOL=[['#f4b8c8','Pink'],['#f8e8d0','Cream'],['#f0f0f0','White'],['#d0b8f0','Lavender'],['#88d8c0','Mint'],['#8B5530','Choc']];
 // Cake flavours — sponge colour shown as the exposed crumb band at the base
 var FLAVORS=[
-  {id:'vanilla',n:'Vanilla',e:'🍦',s:'#f1e1bb'},
-  {id:'chocolate',n:'Chocolate',e:'🍫',s:'#6b4630'},
-  {id:'strawberry',n:'Strawberry',e:'🍓',s:'#f0bcc8'},
-  {id:'redvelvet',n:'Red Velvet',e:'❤️',s:'#a23b40'},
-  {id:'matcha',n:'Matcha',e:'🍵',s:'#bcd592'},
-  {id:'lemon',n:'Lemon',e:'🍋',s:'#f3df85'},
-  {id:'ube',n:'Ube',e:'💜',s:'#b49bd8'},
-  {id:'funfetti',n:'Funfetti',e:'🎉',s:'#efe6d2'}
+  {id:'vanilla',n:'Vanilla',e:_ei('1f366'),s:'#f1e1bb'},
+  {id:'chocolate',n:'Chocolate',e:_ei('1f36b'),s:'#6b4630'},
+  {id:'strawberry',n:'Strawberry',e:_ei('1f353'),s:'#f0bcc8'},
+  {id:'redvelvet',n:'Red Velvet',e:_ei('2764-fe0f'),s:'#a23b40'},
+  {id:'matcha',n:'Matcha',e:_ei('1f375'),s:'#bcd592'},
+  {id:'lemon',n:'Lemon',e:_ei('1f34b'),s:'#f3df85'},
+  {id:'ube',n:'Ube',e:_ei('1f49c'),s:'#b49bd8'},
+  {id:'funfetti',n:'Funfetti',e:_ei('1f389'),s:'#efe6d2'}
 ];
 function flavorById(id){for(var i=0;i<FLAVORS.length;i++)if(FLAVORS[i].id===id)return FLAVORS[i];return FLAVORS[0];}
 // Default color suggestion per decoration type (null = keep current decorColor)
 var DECOR_DEFAULTS={moon:'#c2cdd8',starflat:'#c9a84c',flower:'#f0a0b0',heart:'#e08090',candle:null,rosette:null,pearl:null,custom:null,whipcream:'#fbf6ec'};
 var DECOR_TYPES=[
-  {id:'rosette',icon:'🌸',name:'Rosette'},{id:'pearl',icon:'⚪',name:'Pearl'},
-  {id:'flower',icon:'🌺',name:'Flower'},{id:'moon',icon:'🌙',name:'Moon'},
-  {id:'starflat',icon:'⭐',name:'Star'},{id:'heart',icon:'💗',name:'Heart'},
-  {id:'candle',icon:'🕯',name:'Candle'},{id:'whipcream',icon:'🌀',name:'Whip Cream'},
-  {id:'custom',icon:'✏️',name:'Custom'}
+  {id:'rosette',icon:_ei('1f338'),name:'Rosette'},{id:'pearl',icon:_ei('26aa'),name:'Pearl'},
+  {id:'flower',icon:_ei('1f33a'),name:'Flower'},{id:'moon',icon:_ei('1f319'),name:'Moon'},
+  {id:'starflat',icon:_ei('2b50'),name:'Star'},{id:'heart',icon:_ei('1f497'),name:'Heart'},
+  {id:'candle',icon:_ei('1f56f-fe0f'),name:'Candle'},{id:'whipcream',icon:_ei('1f300'),name:'Whip Cream'},
+  {id:'custom',icon:_ei('270f-fe0f'),name:'Custom'}
 ];
 var cakeData=[];
 for(var i=0;i<4;i++) cakeData.push({color:'#aaccdf',finish:'satin',flavor:['vanilla','strawberry','ube','chocolate'][i],top:['tarot_star','photo','text','tarot_moon'][i],t1:['THE STAR','','Older, Hotter, Wiser','THE MOON'][i],t2:['','','XXII',''][i],t3:'',decorations:[]});

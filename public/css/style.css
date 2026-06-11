@@ -333,6 +333,7 @@ select.txt{appearance:none;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
   font-size:21px;transition:all .15s var(--ease);background:rgba(255,255,255,0.025);
 }
+img.emo{width:22px;height:22px;display:inline-block;vertical-align:middle;pointer-events:none;}
 .dec-item span{font-size:8.5px;letter-spacing:.5px;color:var(--text-3);font-weight:600}
 .dec-item:hover{border-color:var(--gold-22);background:var(--gold-08)}
 .dec-item.on{border-color:var(--gold-35);background:var(--gold-14);
