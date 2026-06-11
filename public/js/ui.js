@@ -8,16 +8,16 @@
    ════════════════════════════════════════════════════════════ */
 (function(){
 
-  /* ── topping catalogue (elegant glyphs, no emoji) ── */
+  /* ── topping catalogue ── */
   var TOPPINGS=[
-    {id:'tarot_star',    g:'✦', n:'The Star'},
-    {id:'tarot_moon',    g:'☾', n:'The Moon'},
-    {id:'constellation', g:'✧', n:'Constellation'},
-    {id:'floral',        g:'❀', n:'Floral'},
-    {id:'heart',         g:'♡', n:'Heart'},
-    {id:'photo',         g:'▣', n:'Photo Print'},
-    {id:'text',          g:'✍', n:'Custom Text'},
-    {id:'plain',         g:'◦', n:'Plain'}
+    {id:'tarot_star',    g:_ei('2b50'),  n:'The Star'},
+    {id:'tarot_moon',    g:_ei('1f319'), n:'The Moon'},
+    {id:'constellation', g:_ei('2728'),  n:'Constellation'},
+    {id:'floral',        g:_ei('1f338'), n:'Floral'},
+    {id:'heart',         g:_ei('1f497'), n:'Heart'},
+    {id:'photo',         g:_ei('1f4f7'), n:'Photo Print'},
+    {id:'text',          g:_ei('270f'),  n:'Custom Text'},
+    {id:'plain',         g:_ei('2b1c'),  n:'Plain'}
   ];
 
   function $(id){return document.getElementById(id);}

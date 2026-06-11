@@ -19,7 +19,7 @@ var FLAVORS=[
   {id:'vanilla',n:'Vanilla',e:_ei('1f366'),s:'#f1e1bb'},
   {id:'chocolate',n:'Chocolate',e:_ei('1f36b'),s:'#6b4630'},
   {id:'strawberry',n:'Strawberry',e:_ei('1f353'),s:'#f0bcc8'},
-  {id:'redvelvet',n:'Red Velvet',e:_ei('2764-fe0f'),s:'#a23b40'},
+  {id:'redvelvet',n:'Red Velvet',e:_ei('2764'),s:'#a23b40'},
   {id:'matcha',n:'Matcha',e:_ei('1f375'),s:'#bcd592'},
   {id:'lemon',n:'Lemon',e:_ei('1f34b'),s:'#f3df85'},
   {id:'ube',n:'Ube',e:_ei('1f49c'),s:'#b49bd8'},
@@ -32,8 +32,8 @@ var DECOR_TYPES=[
   {id:'rosette',icon:_ei('1f338'),name:'Rosette'},{id:'pearl',icon:_ei('26aa'),name:'Pearl'},
   {id:'flower',icon:_ei('1f33a'),name:'Flower'},{id:'moon',icon:_ei('1f319'),name:'Moon'},
   {id:'starflat',icon:_ei('2b50'),name:'Star'},{id:'heart',icon:_ei('1f497'),name:'Heart'},
-  {id:'candle',icon:_ei('1f56f-fe0f'),name:'Candle'},{id:'whipcream',icon:_ei('1f300'),name:'Whip Cream'},
-  {id:'custom',icon:_ei('270f-fe0f'),name:'Custom'}
+  {id:'candle',icon:_ei('1f56f'),name:'Candle'},{id:'whipcream',icon:_ei('1f300'),name:'Whip Cream'},
+  {id:'custom',icon:_ei('270f'),name:'Custom'}
 ];
 var cakeData=[];
 for(var i=0;i<4;i++) cakeData.push({color:'#aaccdf',finish:'satin',flavor:['vanilla','strawberry','ube','chocolate'][i],top:['tarot_star','photo','text','tarot_moon'][i],t1:['THE STAR','','Older, Hotter, Wiser','THE MOON'][i],t2:['','','XXII',''][i],t3:'',decorations:[]});
